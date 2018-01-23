@@ -3,56 +3,75 @@
 
   function tawkToService(TAWKTO, $rootScope, $log, $q) {
     var isLoaded = false;
-
+    var onLoadHandlers = [];
+    
     TAWKTO.onLoad = function () {
-      $log.debug('TAWKTO:onLoad');
+      $log.info('TAWKTO:onLoad');
       $rootScope.$broadcast('TAWKTO:onLoad');
+      callOnLoadHandlers();
     };
     TAWKTO.onStatusChange = function (status) {
-      $log.debug('TAWKTO:Status:' + status);
+      $log.info('TAWKTO:Status:' + status);
     };
     //function invoked right when Tawk_API is ready to be used and before the widget is rendered.
     TAWKTO.onBeforeLoad = function () {
       isLoaded = true;
-      $log.debug('TAWKTO:onBeforeLoad');
+      $log.info('TAWKTO:onBeforeLoad');
       $rootScope.$broadcast('TAWKTO:onBeforeLoad');
     };
     TAWKTO.onChatMaximized = function () {
-      $log.debug('TAWKTO:onChatMaximized');
+      $log.info('TAWKTO:onChatMaximized');
       $rootScope.$broadcast('TAWKTO:onChatMaximized');
     };
     TAWKTO.onChatMinimized = function () {
-      $log.debug('TAWKTO:onChatMinimized');
+      $log.info('TAWKTO:onChatMinimized');
       $rootScope.$broadcast('TAWKTO:onChatMinimized');
     };
     TAWKTO.onChatHidden = function () {
-      $log.debug('TAWKTO:onChatHidden');
+      $log.info('TAWKTO:onChatHidden');
       $rootScope.$broadcast('TAWKTO:onChatHidden');
     };
     TAWKTO.onChatStarted = function () {
-      $log.debug('TAWKTO:onChatStarted');
+      $log.info('TAWKTO:onChatStarted');
       $rootScope.$broadcast('TAWKTO:onChatStarted');
     };
     TAWKTO.onChatEnded = function () {
-      $log.debug('TAWKTO:onChatEnded');
+      $log.info('TAWKTO:onChatEnded');
       $rootScope.$broadcast('TAWKTO:onChatEnded');
     };
     TAWKTO.onPrechatSubmit = function (data) {
-      $log.debug('TAWKTO:onPrechatSubmit:' + data);
+      $log.info('TAWKTO:onPrechatSubmit:' + data);
       $rootScope.$broadcast('TAWKTO:onPrechatSubmit', data);
     };
     TAWKTO.onOfflineSubmit = function (data) {
-      $log.debug('TAWKTO:onOfflineSubmit:' + data);
+      $log.info('TAWKTO:onOfflineSubmit:' + data);
       $rootScope.$broadcast('TAWKTO:onOfflineSubmit', data);
     };
 
-    function setVisitor(name, email, hash) {
+    function logout () {
+      onLoadHandlers = [];
+      endChat();
+      hideWidget();
+    }
+
+    function addOnLoadListener (handler) {
       if (isLoaded) {
-        if (hash) {
-          return TAWKTO.visitor = { name: name, email: email, hash: hash };
-        } else {
-          return TAWKTO.visitor = { name: name, email: email };
-        }
+        handler();
+      } else {
+        onLoadHandlers.push(handler);
+      }
+    }
+
+    function callOnLoadHandlers () {
+      onLoadHandlers.forEach(function (handler) {
+        handler();
+      });
+      onLoadHandlers = [];
+    }
+
+    function setVisitor(name, email) {
+      if (isLoaded) {
+        return TAWKTO.visitor = { name: name, email: email };
       }
       return isLoaded;
     }
@@ -239,6 +258,8 @@
     }
 
     return {
+      addOnLoadListener: addOnLoadListener,
+      logout: logout, 
       setVisitor: setVisitor,
       maximize: maximize,
       minimize: minimize,
@@ -272,3 +293,4 @@
     .value('TAWKTO', window.Tawk_API = window.Tawk_API || {})
     .factory('tawkToService', tawkToService);
 }());
+

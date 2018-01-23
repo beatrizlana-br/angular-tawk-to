@@ -1,9 +1,11 @@
 {
-  "name": "angular-tawk-to-ex",
-  "description": "Angular wrapper for Tawk.to javascript API",
+  "name": "tawk-to-climas",
+  "version": "0.1",
+  "description": "Angular wrapper for Tawk.to javascript API. Forked from https://github.com/geo242/angular-tawk-to",
   "authors": [
     "Geoff Tripoli (author)",
-    "Tam Vo (commiter)"
+    "Tam Vo (commiter)",
+    "Beatriz Lana (forker)"
   ],
   "license": "MIT",
   "moduleType": [
